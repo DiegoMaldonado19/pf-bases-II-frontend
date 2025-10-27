@@ -1,0 +1,109 @@
+<div class="search-container">
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>Product Search System</mat-card-title>
+      <mat-card-subtitle>Search through 1M+ products with intelligent ranking</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="search-input-wrapper">
+        <mat-form-field class="search-field" appearance="outline">
+          <mat-label>Search products...</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (keyup.enter)="onSearch()"
+            placeholder="Try: laptop, smartphone, nike..."
+            [matAutocomplete]="auto">
+          <button
+            mat-icon-button
+            matSuffix
+            *ngIf="searchQuery"
+            (click)="clearSearch()">
+            <mat-icon>clear</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="onSearch()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option
+            *ngFor="let suggestion of suggestions"
+            [value]="suggestion"
+            (click)="onSuggestionClick(suggestion)">
+            <mat-icon>search</mat-icon>
+            {{ suggestion }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+
+      <div class="results-info" *ngIf="total > 0 && !loading">
+        <mat-chip-set>
+          <mat-chip>
+            <mat-icon>analytics</mat-icon>
+            {{ total | number }} results found
+          </mat-chip>
+          <mat-chip>
+            <mat-icon>schedule</mat-icon>
+            Page {{ page }} of {{ totalPages }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="loading-spinner" *ngIf="loading">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Searching products...</p>
+      </div>
+
+      <div class="products-grid" *ngIf="!loading && products.length > 0">
+        <mat-card class="product-card" *ngFor="let product of products">
+          <mat-card-header>
+            <mat-card-title class="product-title">{{ product.title }}</mat-card-title>
+            <mat-card-subtitle>{{ product.brand }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="product-details">
+              <div class="detail-row">
+                <mat-icon>category</mat-icon>
+                <span>{{ product.category }}</span>
+              </div>
+              <div class="detail-row">
+                <mat-icon>label</mat-icon>
+                <span>{{ product.product_type }}</span>
+              </div>
+              <div class="detail-row">
+                <mat-icon>qr_code</mat-icon>
+                <span>{{ product.sku }}</span>
+              </div>
+              <div class="detail-row" *ngIf="product.price">
+                <mat-icon>attach_money</mat-icon>
+                <span>{{ product.price | currency }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="no-results" *ngIf="!loading && searchQuery && products.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <h3>No products found</h3>
+        <p>Try different search terms or check your spelling</p>
+      </div>
+
+      <mat-paginator
+        *ngIf="!loading && products.length > 0"
+        [length]="total"
+        [pageSize]="limit"
+        [pageIndex]="page - 1"
+        [pageSizeOptions]="[10, 20, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

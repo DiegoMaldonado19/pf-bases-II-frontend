@@ -6,6 +6,9 @@ export interface Product {
   product_type: string;
   sku: string;
   price?: number;
+  currency?: string;
+  rating?: number;
+  stock?: number;
   description?: string;
   created_at?: Date;
 }

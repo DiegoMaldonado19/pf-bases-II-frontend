@@ -31,7 +31,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs
     MatIconModule
   ],
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  styleUrls: ['./search.component.css']
 })
 export class SearchComponent implements OnInit, OnDestroy {
   searchQuery: string = '';
@@ -42,6 +42,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   totalPages: number = 0;
   loading: boolean = false;
   suggestions: string[] = [];
+  activeFilters: string[] = [];
 
   private searchSubject = new Subject<string>();
   private suggestSubject = new Subject<string>();
@@ -134,5 +135,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.total = 0;
     this.totalPages = 0;
     this.suggestions = [];
+  }
+
+  removeFilter(filter: string): void {
+    this.activeFilters = this.activeFilters.filter(f => f !== filter);
+    this.onSearch();
   }
 }

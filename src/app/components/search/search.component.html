@@ -104,12 +104,12 @@
                 <span class="price">{{ product.price | number:'1.2-2' }} {{ product.currency }}</span>
               </div>
 
-              <div class="detail-row rating-row">
+              <div class="detail-row rating-row" *ngIf="product.rating">
                 <mat-icon [class.high-rating]="product.rating >= 4.5">star</mat-icon>
                 <span>{{ product.rating | number:'1.1-2' }} / 5.0</span>
               </div>
 
-              <div class="detail-row stock-row" [class.low-stock]="product.stock < 10">
+              <div class="detail-row stock-row" *ngIf="product.stock !== undefined" [class.low-stock]="product.stock < 10">
                 <mat-icon>inventory</mat-icon>
                 <span>{{ product.stock }} in stock</span>
               </div>

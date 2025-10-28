@@ -43,4 +43,11 @@ export class ProductService {
   getStats(): Observable<any> {
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/index/stats`);
   }
+
+  uploadCSV(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/upload/csv`, formData);
+  }
 }

@@ -6,6 +6,48 @@
     </mat-card-header>
 
     <mat-card-content>
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <input
+          #fileInput
+          type="file"
+          accept=".csv,.tsv,.txt"
+          (change)="onFileSelected($event)"
+          style="display: none">
+
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="fileInput.click()"
+          [disabled]="uploading">
+          <mat-icon>upload_file</mat-icon>
+          {{ uploading ? 'Uploading...' : 'Upload CSV File' }}
+        </button>
+
+        <span *ngIf="selectedFile" class="file-name">
+          {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
+        </span>
+
+        <button
+          *ngIf="selectedFile"
+          mat-raised-button
+          color="accent"
+          (click)="uploadFile()"
+          [disabled]="uploading">
+          <mat-icon>cloud_upload</mat-icon>
+          Import Data
+        </button>
+
+        <div *ngIf="uploadProgress" class="upload-progress">
+          <mat-progress-bar mode="indeterminate" *ngIf="uploading"></mat-progress-bar>
+          <p [class.success]="uploadSuccess" [class.error]="!uploadSuccess">
+            {{ uploadMessage }}
+          </p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
       <div class="search-input-wrapper">
         <mat-form-field class="search-field" appearance="outline">
           <mat-label>Search products...</mat-label>

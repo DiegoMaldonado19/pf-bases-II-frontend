@@ -2,7 +2,7 @@
   <mat-card class="search-card">
     <mat-card-header>
       <mat-card-title>Product Search System</mat-card-title>
-      <mat-card-subtitle>Search through 1M+ products with intelligent ranking</mat-card-subtitle>
+      <mat-card-subtitle>Search through 1M+ products - DataCorp Solutions</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
@@ -14,7 +14,7 @@
             [(ngModel)]="searchQuery"
             (input)="onSearchInput()"
             (keyup.enter)="onSearch()"
-            placeholder="Try: laptop, smartphone, nike..."
+            placeholder="Try: Silla, NovaHome, Laptop, TECHPR..."
             [matAutocomplete]="auto">
           <button
             mat-icon-button
@@ -42,14 +42,25 @@
         </mat-autocomplete>
       </div>
 
+      <div class="filter-bar" *ngIf="products.length > 0">
+        <mat-chip-set>
+          <mat-chip
+            *ngFor="let filter of activeFilters"
+            (removed)="removeFilter(filter)">
+            {{ filter }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
       <div class="results-info" *ngIf="total > 0 && !loading">
         <mat-chip-set>
           <mat-chip>
-            <mat-icon>analytics</mat-icon>
-            {{ total | number }} results found
+            <mat-icon>inventory_2</mat-icon>
+            {{ total | number }} products
           </mat-chip>
           <mat-chip>
-            <mat-icon>schedule</mat-icon>
+            <mat-icon>pages</mat-icon>
             Page {{ page }} of {{ totalPages }}
           </mat-chip>
         </mat-chip-set>
@@ -63,36 +74,65 @@
       <div class="products-grid" *ngIf="!loading && products.length > 0">
         <mat-card class="product-card" *ngFor="let product of products">
           <mat-card-header>
-            <mat-card-title class="product-title">{{ product.title }}</mat-card-title>
-            <mat-card-subtitle>{{ product.brand }}</mat-card-subtitle>
+            <mat-card-title class="product-title" [title]="product.title">
+              {{ product.title }}
+            </mat-card-title>
+            <mat-card-subtitle>
+              <strong>{{ product.brand }}</strong>
+            </mat-card-subtitle>
           </mat-card-header>
+
           <mat-card-content>
             <div class="product-details">
               <div class="detail-row">
                 <mat-icon>category</mat-icon>
                 <span>{{ product.category }}</span>
               </div>
+
               <div class="detail-row">
                 <mat-icon>label</mat-icon>
                 <span>{{ product.product_type }}</span>
               </div>
+
               <div class="detail-row">
                 <mat-icon>qr_code</mat-icon>
-                <span>{{ product.sku }}</span>
+                <span class="sku">{{ product.sku }}</span>
               </div>
-              <div class="detail-row" *ngIf="product.price">
-                <mat-icon>attach_money</mat-icon>
-                <span>{{ product.price | currency }}</span>
+
+              <div class="detail-row price-row">
+                <mat-icon>payments</mat-icon>
+                <span class="price">{{ product.price | number:'1.2-2' }} {{ product.currency }}</span>
+              </div>
+
+              <div class="detail-row rating-row">
+                <mat-icon [class.high-rating]="product.rating >= 4.5">star</mat-icon>
+                <span>{{ product.rating | number:'1.1-2' }} / 5.0</span>
+              </div>
+
+              <div class="detail-row stock-row" [class.low-stock]="product.stock < 10">
+                <mat-icon>inventory</mat-icon>
+                <span>{{ product.stock }} in stock</span>
               </div>
             </div>
+
+            <div class="product-description" *ngIf="product.description">
+              <p>{{ product.description | slice:0:120 }}{{ product.description.length > 120 ? '...' : '' }}</p>
+            </div>
           </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button color="primary">
+              <mat-icon>visibility</mat-icon>
+              View Details
+            </button>
+          </mat-card-actions>
         </mat-card>
       </div>
 
       <div class="no-results" *ngIf="!loading && searchQuery && products.length === 0">
         <mat-icon>search_off</mat-icon>
         <h3>No products found</h3>
-        <p>Try different search terms or check your spelling</p>
+        <p>Try different search terms like brand names (NovaHome, TechPro), categories (Hogar, Electrónica), or product types</p>
       </div>
 
       <mat-paginator

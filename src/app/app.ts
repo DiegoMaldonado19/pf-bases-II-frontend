@@ -8,5 +8,5 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('pf-bases-II-frontend');
+  protected readonly title = signal('Sistema de Indexación de Productos');
 }

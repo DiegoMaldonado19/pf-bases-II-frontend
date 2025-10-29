@@ -14,9 +14,9 @@ import { MatIconModule } from '@angular/material/icon';
   template: `
     <mat-toolbar color="primary">
       <mat-icon>inventory_2</mat-icon>
-      <span class="toolbar-title">Products Indexing System</span>
+      <span class="toolbar-title">Proyecto Final Bases II</span>
       <span class="spacer"></span>
-      <span class="subtitle">MongoDB + Redis + Angular</span>
+      <span class="subtitle">Sistema de Indexación de Productos</span>
     </mat-toolbar>
     <main>
       <router-outlet></router-outlet>

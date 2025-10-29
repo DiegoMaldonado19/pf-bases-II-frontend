@@ -160,12 +160,32 @@
             <div class="product-description" *ngIf="product.description">
               <p>{{ product.description | slice:0:120 }}{{ product.description.length > 120 ? '...' : '' }}</p>
             </div>
+
+            <!-- Expanded Details -->
+            <div class="expanded-details" *ngIf="isProductExpanded(product.id)">
+              <mat-divider></mat-divider>
+              <div class="detail-section">
+                <h4>Full Description</h4>
+                <p>{{ product.description || 'No description available' }}</p>
+              </div>
+              <div class="detail-section">
+                <h4>Additional Information</h4>
+                <div class="detail-row">
+                  <mat-icon>confirmation_number</mat-icon>
+                  <span><strong>Product ID:</strong> {{ product.id }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.created_at">
+                  <mat-icon>schedule</mat-icon>
+                  <span><strong>Created:</strong> {{ product.created_at | date:'medium' }}</span>
+                </div>
+              </div>
+            </div>
           </mat-card-content>
 
           <mat-card-actions>
-            <button mat-button color="primary">
-              <mat-icon>visibility</mat-icon>
-              View Details
+            <button mat-button color="primary" (click)="toggleProductDetails(product.id)">
+              <mat-icon>{{ isProductExpanded(product.id) ? 'expand_less' : 'visibility' }}</mat-icon>
+              {{ isProductExpanded(product.id) ? 'Hide Details' : 'View Details' }}
             </button>
           </mat-card-actions>
         </mat-card>

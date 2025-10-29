@@ -200,6 +200,49 @@ mat-divider {
     }
   }
 
+  .expanded-details {
+    margin-top: 15px;
+    animation: slideDown 0.3s ease-in-out;
+
+    mat-divider {
+      margin: 15px 0;
+    }
+
+    .detail-section {
+      margin-bottom: 15px;
+
+      h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.87);
+        margin: 0 0 10px 0;
+      }
+
+      p {
+        font-size: 13px;
+        color: rgba(0, 0, 0, 0.7);
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .detail-row {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+    }
+    to {
+      opacity: 1;
+      max-height: 500px;
+    }
+  }
+
   mat-card-actions {
     margin-top: auto;
     padding-top: 10px;

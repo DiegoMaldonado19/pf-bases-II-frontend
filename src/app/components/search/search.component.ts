@@ -47,13 +47,14 @@ export class SearchComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   suggestions: string[] = [];
   activeFilters: string[] = [];
-  
+
   // Upload properties
   selectedFile: File | null = null;
   uploading: boolean = false;
   uploadProgress: boolean = false;
   uploadMessage: string = '';
   uploadSuccess: boolean = false;
+  expandedProductId: number | null = null;
 
   private searchSubject = new Subject<string>();
   private suggestSubject = new Subject<string>();
@@ -137,7 +138,22 @@ export class SearchComponent implements OnInit, OnDestroy {
   onPageChange(event: PageEvent): void {
     this.page = event.pageIndex + 1;
     this.limit = event.pageSize;
-    this.searchSubject.next(this.searchQuery);
+
+    if (this.searchQuery && this.searchQuery.trim().length > 0) {
+      this.loading = true;
+      this.productService.search(this.searchQuery, this.page, this.limit).subscribe({
+        next: (result: SearchResult) => {
+          this.loading = false;
+          this.products = result.products;
+          this.total = result.total;
+          this.totalPages = result.totalPages;
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Search error:', error);
+        }
+      });
+    }
   }
 
   clearSearch(): void {
@@ -174,16 +190,18 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.productService.uploadCSV(this.selectedFile).subscribe({
       next: (response) => {
         this.uploading = false;
+        this.uploadProgress = false;
         this.uploadSuccess = true;
         this.uploadMessage = `✓ ${response.message || 'File uploaded successfully!'}`;
-        
+        this.selectedFile = null;
+
         setTimeout(() => {
-          this.selectedFile = null;
-          this.uploadProgress = false;
-        }, 3000);
+          this.uploadMessage = '';
+        }, 5000);
       },
       error: (error) => {
         this.uploading = false;
+        this.uploadProgress = false;
         this.uploadSuccess = false;
         this.uploadMessage = `✗ Error: ${error.error?.message || 'Failed to upload file'}`;
         console.error('Upload error:', error);
@@ -197,5 +215,17 @@ export class SearchComponent implements OnInit, OnDestroy {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  toggleProductDetails(productId: number): void {
+    if (this.expandedProductId === productId) {
+      this.expandedProductId = null;
+    } else {
+      this.expandedProductId = productId;
+    }
+  }
+
+  isProductExpanded(productId: number): boolean {
+    return this.expandedProductId === productId;
   }
 }

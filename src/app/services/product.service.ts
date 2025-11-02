@@ -47,7 +47,10 @@ export class ProductService {
   uploadCSV(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    
-    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/upload/csv`, formData);
+
+    return this.http.post<ApiResponse<any>>(`${this.apiUrl}/upload/csv`, formData, {
+      reportProgress: true,
+      observe: 'body'
+    });
   }
 }

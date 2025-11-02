@@ -1,8 +1,8 @@
 <div class="search-container">
   <mat-card class="search-card">
     <mat-card-header>
-      <mat-card-title>Product Search System</mat-card-title>
-      <mat-card-subtitle>Search through 1M+ products - DataCorp Solutions</mat-card-subtitle>
+      <mat-card-title>Sistema de Busqueda de Productos</mat-card-title>
+      <mat-card-subtitle>Buscar entre más de 1M de productos - DataCorp Solutions</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
@@ -21,7 +21,7 @@
           (click)="fileInput.click()"
           [disabled]="uploading">
           <mat-icon>upload_file</mat-icon>
-          {{ uploading ? 'Uploading...' : 'Upload CSV File' }}
+          {{ uploading ? 'Cargando...' : 'Cargar archivo CSV' }}
         </button>
 
         <span *ngIf="selectedFile" class="file-name">
@@ -35,7 +35,7 @@
           (click)="uploadFile()"
           [disabled]="uploading">
           <mat-icon>cloud_upload</mat-icon>
-          Import Data
+          Importar Datos
         </button>
 
         <div *ngIf="uploadProgress" class="upload-progress">
@@ -50,13 +50,13 @@
 
       <div class="search-input-wrapper">
         <mat-form-field class="search-field" appearance="outline">
-          <mat-label>Search products...</mat-label>
+          <mat-label>Buscar productos...</mat-label>
           <input
             matInput
             [(ngModel)]="searchQuery"
             (input)="onSearchInput()"
             (keyup.enter)="onSearch()"
-            placeholder="Try: Silla, NovaHome, Laptop, TECHPR..."
+            placeholder="Prueba: Silla, NovaHome, Laptop, TECHPR..."
             [matAutocomplete]="auto">
           <button
             mat-icon-button
@@ -99,18 +99,18 @@
         <mat-chip-set>
           <mat-chip>
             <mat-icon>inventory_2</mat-icon>
-            {{ total | number }} products
+            {{ total | number }} productos
           </mat-chip>
           <mat-chip>
             <mat-icon>pages</mat-icon>
-            Page {{ page }} of {{ totalPages }}
+            Página {{ page }} de {{ totalPages }}
           </mat-chip>
         </mat-chip-set>
       </div>
 
       <div class="loading-spinner" *ngIf="loading">
         <mat-spinner diameter="50"></mat-spinner>
-        <p>Searching products...</p>
+        <p>Buscando productos...</p>
       </div>
 
       <div class="products-grid" *ngIf="!loading && products.length > 0">
@@ -153,7 +153,7 @@
 
               <div class="detail-row stock-row" *ngIf="product.stock !== undefined" [class.low-stock]="product.stock < 10">
                 <mat-icon>inventory</mat-icon>
-                <span>{{ product.stock }} in stock</span>
+                <span>{{ product.stock }} en stock</span>
               </div>
             </div>
 
@@ -162,30 +162,30 @@
             </div>
 
             <!-- Expanded Details -->
-            <div class="expanded-details" *ngIf="isProductExpanded(product.id)">
+            <div class="expanded-details" *ngIf="isProductExpanded(product._id!)">
               <mat-divider></mat-divider>
               <div class="detail-section">
-                <h4>Full Description</h4>
-                <p>{{ product.description || 'No description available' }}</p>
+                <h4>Descripción Completa</h4>
+                <p>{{ product.description || 'No hay descripción disponible' }}</p>
               </div>
               <div class="detail-section">
-                <h4>Additional Information</h4>
+                <h4>Información Adicional</h4>
                 <div class="detail-row">
                   <mat-icon>confirmation_number</mat-icon>
-                  <span><strong>Product ID:</strong> {{ product.id }}</span>
+                  <span><strong>ID del Producto:</strong> {{ product._id }}</span>
                 </div>
                 <div class="detail-row" *ngIf="product.created_at">
                   <mat-icon>schedule</mat-icon>
-                  <span><strong>Created:</strong> {{ product.created_at | date:'medium' }}</span>
+                  <span><strong>Creado:</strong> {{ product.created_at | date:'medium' }}</span>
                 </div>
               </div>
             </div>
           </mat-card-content>
 
           <mat-card-actions>
-            <button mat-button color="primary" (click)="toggleProductDetails(product.id)">
-              <mat-icon>{{ isProductExpanded(product.id) ? 'expand_less' : 'visibility' }}</mat-icon>
-              {{ isProductExpanded(product.id) ? 'Hide Details' : 'View Details' }}
+            <button mat-button color="primary" (click)="toggleProductDetails(product._id!)">
+              <mat-icon>{{ isProductExpanded(product._id!) ? 'expand_less' : 'visibility' }}</mat-icon>
+              {{ isProductExpanded(product._id!) ? 'Ocultar Detalles' : 'Ver Detalles' }}
             </button>
           </mat-card-actions>
         </mat-card>
@@ -193,8 +193,8 @@
 
       <div class="no-results" *ngIf="!loading && searchQuery && products.length === 0">
         <mat-icon>search_off</mat-icon>
-        <h3>No products found</h3>
-        <p>Try different search terms like brand names (NovaHome, TechPro), categories (Hogar, Electrónica), or product types</p>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta con diferentes términos de búsqueda como nombres de marca (NovaHome, TechPro), categorías (Hogar, Electrónica), o tipos de productos</p>
       </div>
 
       <mat-paginator

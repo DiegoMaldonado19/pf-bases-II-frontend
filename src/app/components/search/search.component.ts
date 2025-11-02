@@ -54,7 +54,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   uploadProgress: boolean = false;
   uploadMessage: string = '';
   uploadSuccess: boolean = false;
-  expandedProductId: number | null = null;
+  expandedProductId: string | null = null;
 
   private searchSubject = new Subject<string>();
   private suggestSubject = new Subject<string>();
@@ -185,14 +185,14 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     this.uploading = true;
     this.uploadProgress = true;
-    this.uploadMessage = 'Uploading and processing file...';
+    this.uploadMessage = 'Cargando y procesando archivo...';
 
     this.productService.uploadCSV(this.selectedFile).subscribe({
       next: (response) => {
         this.uploading = false;
         this.uploadProgress = false;
         this.uploadSuccess = true;
-        this.uploadMessage = `✓ ${response.message || 'File uploaded successfully!'}`;
+        this.uploadMessage = `✓ ${response.message || '¡Archivo cargado exitosamente!'}`;
         this.selectedFile = null;
 
         setTimeout(() => {
@@ -203,7 +203,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.uploading = false;
         this.uploadProgress = false;
         this.uploadSuccess = false;
-        this.uploadMessage = `✗ Error: ${error.error?.message || 'Failed to upload file'}`;
+        this.uploadMessage = `✗ Error: ${error.error?.message || 'Error al cargar el archivo'}`;
         console.error('Upload error:', error);
       }
     });
@@ -217,7 +217,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   }
 
-  toggleProductDetails(productId: number): void {
+  toggleProductDetails(productId: string): void {
     if (this.expandedProductId === productId) {
       this.expandedProductId = null;
     } else {
@@ -225,7 +225,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  isProductExpanded(productId: number): boolean {
+  isProductExpanded(productId: string): boolean {
     return this.expandedProductId === productId;
   }
 }

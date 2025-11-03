@@ -56,23 +56,22 @@ export class SearchComponent implements OnInit, OnDestroy {
   uploadSuccess: boolean = false;
   expandedProductId: string | null = null;
 
-  private searchSubject = new Subject<string>();
+  private searchSubject = new Subject<{ query: string; page: number; limit: number }>();
+  private pageChangeSubject = new Subject<{ query: string; page: number; limit: number }>();
   private suggestSubject = new Subject<string>();
 
   constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => {
-        if (!query || query.trim().length === 0) {
-          return of(null);
-        }
-        this.loading = true;
-        return this.productService.search(query, this.page, this.limit);
-      })
-    ).subscribe({
+    const processSearch = (params: { query: string; page: number; limit: number }) => {
+      if (!params.query || params.query.trim().length === 0) {
+        return of(null);
+      }
+      this.loading = true;
+      return this.productService.search(params.query, params.page, params.limit);
+    };
+
+    const handleSearchResult = {
       next: (result: SearchResult | null) => {
         this.loading = false;
         if (result) {
@@ -85,11 +84,26 @@ export class SearchComponent implements OnInit, OnDestroy {
           this.totalPages = 0;
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         this.loading = false;
         console.error('Search error:', error);
       }
-    });
+    };
+
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged((prev, curr) =>
+        prev.query === curr.query && prev.page === curr.page && prev.limit === curr.limit
+      ),
+      switchMap(processSearch)
+    ).subscribe(handleSearchResult);
+
+    this.pageChangeSubject.pipe(
+      distinctUntilChanged((prev, curr) =>
+        prev.query === curr.query && prev.page === curr.page && prev.limit === curr.limit
+      ),
+      switchMap(processSearch)
+    ).subscribe(handleSearchResult);
 
     this.suggestSubject.pipe(
       debounceTime(200),
@@ -113,19 +127,20 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.searchSubject.complete();
+    this.pageChangeSubject.complete();
     this.suggestSubject.complete();
   }
 
   onSearchInput(): void {
     this.page = 1;
-    this.searchSubject.next(this.searchQuery);
+    this.searchSubject.next({ query: this.searchQuery, page: this.page, limit: this.limit });
     this.suggestSubject.next(this.searchQuery);
   }
 
   onSearch(): void {
     if (this.searchQuery && this.searchQuery.trim().length > 0) {
       this.page = 1;
-      this.searchSubject.next(this.searchQuery);
+      this.searchSubject.next({ query: this.searchQuery, page: this.page, limit: this.limit });
     }
   }
 
@@ -136,23 +151,16 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: PageEvent): void {
+    const previousPageSize = this.limit;
     this.page = event.pageIndex + 1;
     this.limit = event.pageSize;
 
+    if (previousPageSize !== event.pageSize) {
+      this.page = 1;
+    }
+
     if (this.searchQuery && this.searchQuery.trim().length > 0) {
-      this.loading = true;
-      this.productService.search(this.searchQuery, this.page, this.limit).subscribe({
-        next: (result: SearchResult) => {
-          this.loading = false;
-          this.products = result.products;
-          this.total = result.total;
-          this.totalPages = result.totalPages;
-        },
-        error: (error) => {
-          this.loading = false;
-          console.error('Search error:', error);
-        }
-      });
+      this.pageChangeSubject.next({ query: this.searchQuery, page: this.page, limit: this.limit });
     }
   }
 
@@ -183,12 +191,14 @@ export class SearchComponent implements OnInit, OnDestroy {
       return;
     }
 
+    console.log('[FRONTEND] Iniciando carga de archivo:', this.selectedFile.name);
     this.uploading = true;
     this.uploadProgress = true;
-    this.uploadMessage = 'Cargando y procesando archivo...';
+    this.uploadMessage = 'Cargando y procesando archivo... (Esto puede tomar varios minutos para archivos grandes)';
 
     this.productService.uploadCSV(this.selectedFile).subscribe({
       next: (response) => {
+        console.log('[FRONTEND] Respuesta recibida del backend:', response);
         this.uploading = false;
         this.uploadProgress = false;
         this.uploadSuccess = true;
@@ -197,14 +207,24 @@ export class SearchComponent implements OnInit, OnDestroy {
 
         setTimeout(() => {
           this.uploadMessage = '';
+          this.uploadSuccess = false;
         }, 5000);
       },
       error: (error) => {
+        console.error('[FRONTEND] Error recibido:', error);
         this.uploading = false;
         this.uploadProgress = false;
         this.uploadSuccess = false;
-        this.uploadMessage = `✗ Error: ${error.error?.message || 'Error al cargar el archivo'}`;
-        console.error('Upload error:', error);
+
+        let errorMessage = 'Error al cargar el archivo';
+        if (error.status === 0) {
+          errorMessage = 'Error de conexión. El servidor puede estar procesando el archivo todavía.';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+
+        this.uploadMessage = `✗ Error: ${errorMessage}`;
+        console.error('Upload error details:', error);
       }
     });
   }

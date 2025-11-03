@@ -50,7 +50,7 @@ export class ProductService {
 
     return this.http.post<ApiResponse<any>>(`${this.apiUrl}/upload/csv`, formData, {
       reportProgress: true,
-      observe: 'body'
+      observe: 'body',
     });
   }
 }
